@@ -1,6 +1,3 @@
-'''These functions process, transform, and visualize data for the
-    Kaggle Ames House Price Prediction competition.
-'''
 import pandas as pd
 
 
@@ -23,20 +20,25 @@ def load_data(datafile, ix):
     return data
 
 
-def get_num_vars(data):
+def get_num_vars(data, *args):
     '''
         Returns the variables of a dataset that are of a numeric type
         
         ARGUMENTS:
         data - the dataframe
+        args - specify additional variables that should not be
+            considered numeric
 
         RETURN:
         num_vars - a dataframe containing only numeric variables
     '''
     
+    
     new_data = data.copy()
     num_vars = new_data.select_dtypes(exclude=['object', 'category'])
-    
+    for arg in args:
+        num_vars = num_vars.drop(arg, axis=1)
+
     return num_vars
 
 
@@ -60,5 +62,22 @@ def get_catg_vars(data, *args):
     for arg in args:
         catg_vars = pd.concat([catg_vars, new_data[arg]], axis=1)
     
-
     return catg_vars
+
+
+def conv_to_catg_type(data, catg_vars):
+    '''
+        Convert the categorical values to data type category
+
+        ARGUMENTS:
+        data - the dataframe
+        catg_vars - list of the names of the categorical variables
+
+        RETURN:
+        data - modified dataframe where the categorical variables have
+            been converted to data type 'category'
+    '''
+    
+    data[catg_vars] = data[catg_vars].apply(lambda x: x.astype('category'))
+    
+    return data
